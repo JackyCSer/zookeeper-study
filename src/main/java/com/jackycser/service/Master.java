@@ -19,13 +19,12 @@
 
 package com.jackycser.service;
 
+import com.jackycser.service.recovery.RecoveredAssignments;
 import org.apache.zookeeper.AsyncCallback.*;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooDefs.Ids;
-import org.apache.zookeeper.book.recovery.RecoveredAssignments;
-import org.apache.zookeeper.book.recovery.RecoveredAssignments.RecoveryCallback;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,35 +39,34 @@ import java.util.Random;
  * This class implements the master of the master-worker example we use
  * throughout the book. The master is responsible for tracking the list of
  * available workers, determining when there are new tasks and assigning
- * them to available workers. 
- *
+ * them to available workers.
+ * <p>
  * The flow without crashes is like this. The master reads the list of
  * available workers and watch for changes to the list of workers. It also
  * reads the list of tasks and watches for changes to the list of tasks.
  * For each new task, it assigns the task to a worker chosen at random.
- *
+ * <p>
  * Before exercising the role of master, this ZooKeeper client first needs
  * to elect a primary master. It does it by creating a /master znode. If
  * it succeeds, then it exercises the role of master. Otherwise, it watches
  * the /master znode, and if it goes away, it tries to elect a new primary
  * master.
- *
- * The states of this client are three: RUNNING, ELECTED, NOTELECTED. 
+ * <p>
+ * The states of this client are three: RUNNING, ELECTED, NOTELECTED.
  * RUNNING means that according to its view of the ZooKeeper state, there
  * is no primary master (no master has been able to acquire the /master lock).
  * If some master succeeds in creating the /master znode and this master learns
  * it, then it transitions to ELECTED if it is the primary and NOTELECTED
  * otherwise.
- *
+ * <p>
  * Because workers may crash, this master also needs to be able to reassign
- * tasks. When it watches for changes in the list of workers, it also 
- * receives a notification when a znode representing a worker is gone, so 
+ * tasks. When it watches for changes in the list of workers, it also
+ * receives a notification when a znode representing a worker is gone, so
  * it is able to reassign its tasks.
- *
+ * <p>
  * A primary may crash too. In the case a primary crashes, the next primary
  * that takes over the role needs to make sure that it assigns and reassigns
  * tasks that the previous primary hasn't had time to process.
- *
  */
 public class Master implements Watcher, Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(Master.class);
@@ -132,7 +130,7 @@ public class Master implements Watcher, Closeable {
     /**
      * This method implements the process method of the
      * Watcher interface. We use it to deal with the
-     * different states of a session. 
+     * different states of a session.
      *
      * @param e new session event to be processed
      */
@@ -318,9 +316,9 @@ public class Master implements Watcher, Closeable {
         LOG.info("Going for list of workers");
         getWorkers();
 
-        (new RecoveredAssignments(zk)).recover(new RecoveryCallback() {
+        (new RecoveredAssignments(zk)).recover(new RecoveredAssignments.RecoveryCallback() {
             public void recoveryComplete(int rc, List<String> tasks) {
-                if (rc == RecoveryCallback.FAILED) {
+                if (rc == RecoveredAssignments.RecoveryCallback.FAILED) {
                     LOG.error("Recovery of assigned tasks failed.");
                 } else {
                     LOG.info("Assigning recovered tasks");
@@ -519,7 +517,6 @@ public class Master implements Watcher, Closeable {
 
     /**
      * Context for recreate operation.
-     *
      */
     class RecreateTaskCtx {
         String path;
@@ -781,7 +778,7 @@ public class Master implements Watcher, Closeable {
     };
 
     /**
-     * Closes the ZooKeeper session. 
+     * Closes the ZooKeeper session.
      *
      * @throws IOException
      */
@@ -810,20 +807,21 @@ public class Master implements Watcher, Closeable {
         while (!m.isConnected()) {
             Thread.sleep(60000);
         }
-//        /*
-//         * bootstrap() creates some necessary znodes.
-//         */
+
+        /*
+         * bootstrap() creates some necessary znodes.
+         */
 //        m.bootstrap();
-//
-//        /*
-//         * now runs for master.
-//         */
-//        m.runForMaster();
-//
-//        while (!m.isExpired()) {
-//            Thread.sleep(1000);
-//        }
-//
+
+        /*
+         * now runs for master.
+         */
+        m.runForMaster();
+
+        while (!m.isExpired()) {
+            Thread.sleep(1000);
+        }
+
         m.stopZK();
     }
 }

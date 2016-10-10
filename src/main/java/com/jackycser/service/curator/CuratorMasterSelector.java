@@ -30,6 +30,7 @@ package com.jackycser.service.curator;
  *    workers and tasks.
  */
 
+import com.jackycser.service.recovery.RecoveredAssignments;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -46,8 +47,7 @@ import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.book.recovery.RecoveredAssignments;
-import org.apache.zookeeper.book.recovery.RecoveredAssignments.RecoveryCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,10 +151,10 @@ public class CuratorMasterSelector implements Closeable, LeaderSelectorListener{
         workersCache.getListenable().addListener(workersCacheListener);
         workersCache.start();
         
-        (new RecoveredAssignments(client.getZookeeperClient().getZooKeeper())).recover( new RecoveryCallback() {
+        (new RecoveredAssignments(client.getZookeeperClient().getZooKeeper())).recover(new RecoveredAssignments.RecoveryCallback() {
             public void recoveryComplete (int rc, List<String> tasks) {
                 try{
-                    if(rc == RecoveryCallback.FAILED) {
+                    if(rc == RecoveredAssignments.RecoveryCallback.FAILED) {
                         LOG.warn("Recovery of assigned tasks failed.");
                     } else {
                         LOG.info( "Assigning recovered tasks" );
