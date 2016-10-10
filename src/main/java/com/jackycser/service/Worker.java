@@ -172,6 +172,7 @@ public class Worker implements Watcher, Closeable {
     }
     
     StringCallback createWorkerCallback = new StringCallback() {
+        @Override
         public void processResult(int rc, String path, Object ctx, String name) {
             switch (Code.get(rc)) { 
             case CONNECTIONLOSS:
@@ -199,6 +200,7 @@ public class Worker implements Watcher, Closeable {
     };
     
     StatCallback statusUpdateCallback = new StatCallback() {
+        @Override
         public void processResult(int rc, String path, Object ctx, Stat stat) {
             switch(Code.get(rc)) {
             case CONNECTIONLOSS:
@@ -404,8 +406,9 @@ public class Worker implements Watcher, Closeable {
      * @param args
      * @throws Exception
      */
-    public static void main(String args[]) throws Exception { 
-        Worker w = new Worker(args[0]);
+    public static void main(String args[]) throws Exception {
+        String hostPort = "127.0.0.1:2181";
+        Worker w = new Worker(hostPort);
         w.startZK();
         
         while(!w.isConnected()){

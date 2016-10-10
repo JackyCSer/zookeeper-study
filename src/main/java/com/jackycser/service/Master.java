@@ -247,6 +247,7 @@ public class Master implements Watcher, Closeable {
      *  In this case, we call exists to set a watch on the znode.
      */
     StringCallback masterCreateCallback = new StringCallback() {
+        @Override
         public void processResult(int rc, String path, Object ctx, String name) {
             switch (Code.get(rc)) {
                 case CONNECTIONLOSS:
@@ -280,6 +281,7 @@ public class Master implements Watcher, Closeable {
     }
 
     StatCallback masterExistsCallback = new StatCallback() {
+        @Override
         public void processResult(int rc, String path, Object ctx, Stat stat) {
             switch (Code.get(rc)) {
                 case CONNECTIONLOSS:
@@ -475,17 +477,14 @@ public class Master implements Watcher, Closeable {
             switch (Code.get(rc)) {
                 case CONNECTIONLOSS:
                     getAbsentWorkerTasks(path);
-
                     break;
                 case OK:
-                    LOG.info("Succesfully got a list of assignments: "
+                    LOG.info("Successfully got a list of assignments: "
                             + children.size()
                             + " tasks");
-                
                 /*
                  * Reassign the tasks of the absent worker.  
                  */
-
                     for (String task : children) {
                         getDataReassign(path + "/" + task, task);
                     }
@@ -538,11 +537,9 @@ public class Master implements Watcher, Closeable {
             switch (Code.get(rc)) {
                 case CONNECTIONLOSS:
                     getDataReassign(path, (String) ctx);
-
                     break;
                 case OK:
                     recreateTask(new RecreateTaskCtx(path, (String) ctx, data));
-
                     break;
                 default:
                     LOG.error("Something went wrong when getting data ",
@@ -573,17 +570,14 @@ public class Master implements Watcher, Closeable {
             switch (Code.get(rc)) {
                 case CONNECTIONLOSS:
                     recreateTask((RecreateTaskCtx) ctx);
-
                     break;
                 case OK:
                     deleteAssignment(((RecreateTaskCtx) ctx).path);
-
                     break;
                 case NODEEXISTS:
                     LOG.info("Node exists already, but if it hasn't been deleted, " +
                             "then it will eventually, so we keep trying: " + path);
                     recreateTask((RecreateTaskCtx) ctx);
-
                     break;
                 default:
                     LOG.error("Something wwnt wrong when recreating task",
@@ -629,7 +623,6 @@ public class Master implements Watcher, Closeable {
         public void process(WatchedEvent e) {
             if (e.getType() == EventType.NodeChildrenChanged) {
                 assert "/tasks".equals(e.getPath());
-
                 getTasks();
             }
         }
@@ -811,7 +804,7 @@ public class Master implements Watcher, Closeable {
         /*
          * bootstrap() creates some necessary znodes.
          */
-//        m.bootstrap();
+        m.bootstrap();
 
         /*
          * now runs for master.
