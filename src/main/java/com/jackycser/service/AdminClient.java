@@ -25,7 +25,6 @@ public class AdminClient implements Watcher {
     }
 
     private void listState() throws KeeperException, InterruptedException {
-
         try {
             Stat stat = new Stat();
             byte masterData[] = zk.getData("/master", false, stat);

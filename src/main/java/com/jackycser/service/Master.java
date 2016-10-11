@@ -430,7 +430,7 @@ public class Master implements Watcher, Closeable {
                     getWorkers();
                     break;
                 case OK:
-                    LOG.info("Succesfully got a list of workers: "
+                    LOG.info("Successfully got a list of workers: "
                             + children.size()
                             + " workers");
                     reassignAndSet(children);
@@ -580,7 +580,7 @@ public class Master implements Watcher, Closeable {
                     recreateTask((RecreateTaskCtx) ctx);
                     break;
                 default:
-                    LOG.error("Something wwnt wrong when recreating task",
+                    LOG.error("Something went wrong when recreating task",
                             KeeperException.create(Code.get(rc)));
             }
         }
