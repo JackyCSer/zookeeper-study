@@ -17,9 +17,9 @@
  */
 
 
-package com.jackycser.service;
+package com.jackycser.zookeeper;
 
-import com.jackycser.service.recovery.RecoveredAssignments;
+import com.jackycser.zookeeper.recovery.RecoveredAssignments;
 import org.apache.zookeeper.AsyncCallback.*;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.KeeperException.Code;

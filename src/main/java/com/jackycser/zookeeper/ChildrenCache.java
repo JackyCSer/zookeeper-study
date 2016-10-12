@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.jackycser.service;
+package com.jackycser.zookeeper;
 
 import java.util.ArrayList;
 import java.util.List;

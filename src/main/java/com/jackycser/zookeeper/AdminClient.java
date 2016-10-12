@@ -1,4 +1,4 @@
-package com.jackycser.service;
+package com.jackycser.zookeeper;
 
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;

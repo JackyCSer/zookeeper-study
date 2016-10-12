@@ -17,7 +17,7 @@
  */
 
 
-package com.jackycser.service.recovery;
+package com.jackycser.zookeeper.recovery;
 
 import org.apache.zookeeper.AsyncCallback.ChildrenCallback;
 import org.apache.zookeeper.AsyncCallback.VoidCallback;

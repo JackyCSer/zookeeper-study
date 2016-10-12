@@ -16,7 +16,7 @@
  */
 
 
-package com.jackycser.service.curator;
+package com.jackycser.zookeeper.curator;
 
 
 /**
@@ -29,7 +29,7 @@ package com.jackycser.service.curator;
  *    workers and tasks.
  */
 
-import com.jackycser.service.recovery.RecoveredAssignments;
+import com.jackycser.zookeeper.recovery.RecoveredAssignments;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -39,7 +39,6 @@ import org.apache.curator.framework.api.UnhandledErrorListener;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent.Type;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;

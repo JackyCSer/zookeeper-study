@@ -17,7 +17,7 @@
  */
 
 
-package com.jackycser.service.curator;
+package com.jackycser.zookeeper.curator;
 
 
 /**
@@ -30,7 +30,7 @@ package com.jackycser.service.curator;
  *    workers and tasks.
  */
 
-import com.jackycser.service.recovery.RecoveredAssignments;
+import com.jackycser.zookeeper.recovery.RecoveredAssignments;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -40,13 +40,13 @@ import org.apache.curator.framework.api.UnhandledErrorListener;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent.Type;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,16 +58,14 @@ import java.util.concurrent.CountDownLatch;
 
 //import org.apache.zookeeper.Watcher;
 
-public class CuratorMaster implements Closeable, LeaderSelectorListener{
-    private static final Logger LOG = LoggerFactory.getLogger(CuratorMaster.class);
+public class CuratorMasterSelector implements Closeable, LeaderSelectorListener{
+    private static final Logger LOG = LoggerFactory.getLogger(CuratorMasterSelector.class);
     
     private String myId;
     private CuratorFramework client;
     private final LeaderSelector leaderSelector;
     private final PathChildrenCache workersCache;
     private final PathChildrenCache tasksCache;
-    
-    //private final ThreadPoolExecutor executor;
         
     
     /*
@@ -90,7 +88,7 @@ public class CuratorMaster implements Closeable, LeaderSelectorListener{
      * @param retryPolicy
      *          Curator retry policy
      */
-    public CuratorMaster(String myId, String hostPort, RetryPolicy retryPolicy){
+    public CuratorMasterSelector(String myId, String hostPort, RetryPolicy retryPolicy){
         LOG.info( myId + ": " + hostPort );
         
         this.myId = myId;
@@ -114,9 +112,17 @@ public class CuratorMaster implements Closeable, LeaderSelectorListener{
     }
     
     public void runForMaster() {
-        leaderSelector.setId(myId);
+        /*
+         * Register listeners
+         */
+        client.getCuratorListenable().addListener(masterListener);
+        client.getUnhandledErrorListenable().addListener(errorsListener);
+        
+        /*
+         * Starting master
+         */
         LOG.info( "Starting master selection: " + myId);
-        //leaderSelector.autoRequeue();
+        leaderSelector.setId(myId);
         leaderSelector.start();
     }
     
@@ -137,12 +143,6 @@ public class CuratorMaster implements Closeable, LeaderSelectorListener{
     {
      
         LOG.info( "Mastership participants: " + myId + ", " + leaderSelector.getParticipants() );
-        
-        /*
-         * Register listeners
-         */
-        client.getCuratorListenable().addListener(masterListener);
-        client.getUnhandledErrorListenable().addListener(errorsListener);
         
         /*
          * Start workersCache
@@ -444,7 +444,7 @@ public class CuratorMaster implements Closeable, LeaderSelectorListener{
     
     public static void main (String[] args) {
         try{
-            CuratorMaster master = new CuratorMaster(args[0], args[1], 
+            CuratorMasterSelector master = new CuratorMasterSelector(args[0], args[1], 
                     new ExponentialBackoffRetry(1000, 5));
             master.startZK();
             master.bootstrap();

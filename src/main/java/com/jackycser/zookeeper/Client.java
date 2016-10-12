@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.jackycser.service;
+package com.jackycser.zookeeper;
 
 import org.apache.zookeeper.AsyncCallback.DataCallback;
 import org.apache.zookeeper.AsyncCallback.StatCallback;
