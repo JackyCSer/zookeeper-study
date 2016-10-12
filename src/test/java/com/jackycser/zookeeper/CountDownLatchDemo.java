@@ -10,12 +10,15 @@ package com.jackycser.zookeeper;
  */
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 public class CountDownLatchDemo {
     private static final int PLAYER_AMOUNT = 5;
 
@@ -49,7 +52,7 @@ public class CountDownLatchDemo {
             //等待所有的运动员都到达终点，比赛结束。
             end.await();
         } catch (InterruptedException e) {
-            // TODO: handle exception
+            log.error("Something went wrong: ", e);
             e.printStackTrace();
         } finally {
             System.out.println("Race ends!");//宣布比赛结束
